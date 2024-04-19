@@ -2,23 +2,23 @@ Lidar_front_end:
    lidar_type: 1     # 1 for Livox-avia, 3 for Ouster-OS1-64
    N_SCANS: 256      # default = 6    # Number of lidar scan lines to accept.
    using_raw_point: 1
-   point_step: 1      # default = 1
+   point_step: 3      # default = 1
    
 r3live_common:
    if_dump_log: 0                   # If recording ESIKF update log. [default = 0]
    record_offline_map: 1            # If recording offline map. [default = 1] needed for constructing mesh later
-   pub_pt_minimum_views: 6         # Publish points which have been render up to "pub_pt_minimum_views" time. [default = 3]
-   minimum_pts_size: 0.001          # The minimum distance for every two points in Global map (unit in meter). [default = 0.01] 
+   pub_pt_minimum_views: 8          # Publish points which have been render up to "pub_pt_minimum_views" time. [default = 3]
+   minimum_pts_size: 0.005          # The minimum distance for every two points in Global map (unit in meter). [default = 0.01] 
    image_downsample_ratio: 1        # The downsample ratio of the input image. [default = 1]
    estimate_i2c_extrinsic: 0        # If enable estimate the extrinsic between camera and IMU. [default = 1] 
    estimate_intrinsic: 0            # If enable estimate the online intrinsic calibration of the camera lens. [default = 1] 
    maximum_vio_tracked_pts: 60000   # The maximum points for tracking. [default = 600]
-   append_global_map_point_step: 2  # The point step of append point to global map. [default = 4] if = "1" will slow to a crawl
+   append_global_map_point_step: 4  # The point step of append point to global map. [default = 4] if = "1" will slow to a crawl
    tracker_minimum_depth: 0.001     # Default 0.1 
    tracker_maximum_depth: 2000      # Default 200
    track_windows_size: 400          # Default 40 | GOOD = 400
    esikf_iter_times: 6              # Default 2 | GOOD = 4
-   maximum_image_buffer: 5000      # Default 20000
+   maximum_image_buffer: 20000      # Default 20000
 
 r3live_vio:
    image_width: 640
@@ -32,16 +32,17 @@ r3live_vio:
 
    # Fine extrinsic value. form camera-LiDAR calibration
    camera_ext_R:
-      [-0.01745240643728351,0.0,0.9998476951563913,-0.9998476951563913,0.0,-0.01745240643728351,0.0,-1.0,0.0]
-       
+      [ 0.07003981, -0.01623252,  0.99741212,
+       -0.99741212, -0.01740989,  0.06975647, 
+        0.01623252, -0.99971666, -0.01740989]
    camera_ext_t:
-       [-0.0, -0.0, 0.067]
+       [-3.00000000e+00,  2.77555756e-17,-1.38777878e-17]
 
 r3live_lio:        
    # lio_update_point_step: This parameter determines the point step used for the LIO update. A smaller value means that more points will be used in the LIO update process, potentially improving the accuracy of the pose estimation. However, this may also increase the computational cost.
    lio_update_point_step: 1   # default = 1   
    # max_iteration: This parameter specifies the maximum number of LIO Extended State Information Kalman Filter (ESIKF) iterations. Increasing this number may lead to better convergence and potentially more accurate pose estimation. However, it will also increase the computational cost.
-   max_iteration: 6           # default = 2 
+   max_iteration: 2           # default = 2 
    # lidar_time_delay: This parameter is used to provide a time-offset between the LiDAR and the IMU. A correct time synchronization is crucial for accurate pose estimation. If you are certain that there is no time delay between the LiDAR and the IMU, you can leave this value at zero. Otherwise, you might need to experiment with this parameter to find the optimal time-offset that gives the best results.
    lidar_time_delay: 0        # default = 0 The time-offset between LiDAR and IMU, provided by user. 
    # filter_size_corner: This parameter is related to the edge (corner) feature extraction from the input point cloud. The filter size determines the neighborhood size for edge feature extraction. A smaller value will result in a smaller neighborhood, potentially giving more precise features, but may also lead to more noise. A larger value will result in a larger neighborhood, which could smooth out noise but might result in less precise features.
@@ -57,17 +58,17 @@ r3live_lio:
    #publish_feature_map: No idea lets turn it on -- didn't work
    publish_feature_map: 0     # default = 0
    # voxel_downsample_size_surf: not sure
-   voxel_downsample_size_surf: 0.9020       # default = 0.10
+   voxel_downsample_size_surf: 0.20       # default = 0.10
    # voxel_downsample_size_axis_z: not sure
-   voxel_downsample_size_axis_z: 0.9020     # default = 0.10
+   voxel_downsample_size_axis_z: 0.20     # default = 0.10
    # planar_check_dis: not sure
-   planar_check_dis: 0.9020                 # default 0.10
+   planar_check_dis: 0.20                 # default 0.10
    #long_rang_pt_dis: not sure
-   long_rang_pt_dis: 500                   # default 500
+   long_rang_pt_dis: 250                   # default 500
    #cube_side_length: not sure
    cube_side_length: 1e+07                # default = 1e+07
    #maximum_pt_kdtree_dis
-   maximum_pt_kdtree_dis: 0.5             # default = 0.5
+   maximum_pt_kdtree_dis: 1.0             # default = 0.5
    #maximum_res_dis
-   maximum_res_dis: 0.3                   # default = 0.3
+   maximum_res_dis: 0.6                   # default = 0.3
    

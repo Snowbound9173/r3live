@@ -1,13 +1,13 @@
 Lidar_front_end:
    lidar_type: 1     # 1 for Livox-avia, 3 for Ouster-OS1-64
-   N_SCANS: 256      # default = 6    # Number of lidar scan lines to accept.
+   N_SCANS: 64      # default = 6    # Number of lidar scan lines to accept.
    using_raw_point: 1
    point_step: 1      # default = 1
    
 r3live_common:
    if_dump_log: 0                   # If recording ESIKF update log. [default = 0]
    record_offline_map: 1            # If recording offline map. [default = 1] needed for constructing mesh later
-   pub_pt_minimum_views: 6         # Publish points which have been render up to "pub_pt_minimum_views" time. [default = 3]
+   pub_pt_minimum_views: 12         # Publish points which have been render up to "pub_pt_minimum_views" time. [default = 3]
    minimum_pts_size: 0.001          # The minimum distance for every two points in Global map (unit in meter). [default = 0.01] 
    image_downsample_ratio: 1        # The downsample ratio of the input image. [default = 1]
    estimate_i2c_extrinsic: 0        # If enable estimate the extrinsic between camera and IMU. [default = 1] 
@@ -32,10 +32,11 @@ r3live_vio:
 
    # Fine extrinsic value. form camera-LiDAR calibration
    camera_ext_R:
-      [-0.01745240643728351,0.0,0.9998476951563913,-0.9998476951563913,0.0,-0.01745240643728351,0.0,-1.0,0.0]
-       
+      [ 0.07003981, -0.01623252,  0.99741212,
+       -0.99741212, -0.01740989,  0.06975647, 
+        0.01623252, -0.99971666, -0.01740989]
    camera_ext_t:
-       [-0.0, -0.0, 0.067]
+       [-3.00000000e+00,  2.77555756e-17,-1.38777878e-17]
 
 r3live_lio:        
    # lio_update_point_step: This parameter determines the point step used for the LIO update. A smaller value means that more points will be used in the LIO update process, potentially improving the accuracy of the pose estimation. However, this may also increase the computational cost.
