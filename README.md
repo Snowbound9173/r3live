@@ -79,7 +79,7 @@ sudo apt-get install libcgal-dev pcl-tools
 ### 3.4 **OpenCV >= 3.3**
 You can use the following command to check your OpenCV version, **if your openCV version lower than OpenCV-3.3**, we recommend you to update your you openCV version if you meet errors in complying our codes. Otherwise, skip this step ^_^
 ```
-pkg-config --modversion opencv
+pkg-config --modversion opencv4
 ```
 We have successfully test our algorithm with version **3.3.1**, **3.4.16**, **4.2.1** and **4.5.3**.
 
