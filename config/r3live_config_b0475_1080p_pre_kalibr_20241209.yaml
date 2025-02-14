@@ -1,0 +1,81 @@
+Lidar_front_end:
+   lidar_type: 1     # 1 for Livox-avia, 3 for Ouster-OS1-64
+   N_SCANS: 6      # default = 6    # Number of lidar scan lines to accept.
+   using_raw_point: 1
+   point_step: 1      # default = 1
+   
+r3live_common:
+   if_dump_log: 0                   # If recording ESIKF update log. [default = 0]
+   record_offline_map: 0            # If recording offline map. [default = 1] needed for constructing mesh later
+   pub_pt_minimum_views: 2         # Publish points which have been render up to "pub_pt_minimum_views" time. [default = 3]
+   minimum_pts_size: 0.005          # The minimum distance for every two points in Global map (unit in meter). [default = 0.01] 
+   image_downsample_ratio: 1        # The downsample ratio of the input image. [default = 1] (larger numbers, less photo detail) | note larger numbers give fewer VIO errors
+   estimate_i2c_extrinsic: 0        # If enable estimate the extrinsic between camera and IMU. [default = 1] 
+   estimate_intrinsic: 0            # If enable estimate the online intrinsic calibration of the camera lens. [default = 1] 
+   maximum_vio_tracked_pts: 600     # The maximum points for tracking. [default = 600] note: | too many points slows rendering and frankly add little
+   tracker_minimum_depth: 1.5       # Default 0.1 | test 0.005 | Test >1 is not good (about to test again in ourdoor scene)
+   tracker_maximum_depth: 100       # Default 200 | GOOD = 100 | Trying 2000 to help tracking -- no negative?
+   track_windows_size: 40           # Default 40 | GOOD = 20 | Low#: Slow less RAM(? is this true?) | High: Fast high RAM. Can give this: Catching a cv exception: OpenCV(4.2.0) ../modules/calib3d/src/calibration.cpp:1171: error: (-2:Unspecified error) in function 'void cvFindExtrinsicCameraParams2(const CvMat*, const CvMat*, const CvMat*, const CvMat*, CvMat*, CvMat*, int)'  > DLT algorithm needs at least 6 points for pose estimation from 3D-2D point correspondences. (expected: 'count >= 6'), where >     'count' is 5  > must be greater than or equal to '6' is 6
+   esikf_iter_times: 2              # Default 2 | GOOD = 4 | better 16? | 24 was OK too
+   maximum_image_buffer: 20000      # Default 20000 | Testing 600 bad  | Buffering all images not bad.
+
+# New USB-C B0475 Camera
+r3live_vio: 
+   image_width: 1920
+   image_height: 1080
+   
+   # # Camera Intrinsics - b0475 @ 1080p - November 2024 - Result: OK still some issues.. Best yet? 
+   # camera_intrinsic: [ 1678.2606201171875, 0.0, 961.7382890241715,
+   #                      0.0, 1677.6143798828125, 550.1253902460558,
+   #                      0.0, 0.0, 1.0]
+   # camera_dist_coeffs: [-0.025425, 0.154120, 0.000657, 0.001804, 0.000000 ]  
+   # camera_ext_R: [-0.013011327130951081,-0.026402803400734948,0.9995667047970703,-0.9997620357787238,-0.017161210380439076,-0.013467170224671362,0.01750934555811099,-0.9995040694418712,-0.026173230355961218] 
+   # camera_ext_t: [0.0069780437790404725,0.0012197549274095738,0.07483193905636053] 
+   
+   # B0475 @ 1080p December 1 2024
+   camera_intrinsic: [1678.8103935106521, 0.0, 959.5, 0.0, 1676.7309118993378, 539.5, 0.0, 0.0, 1.0]
+   camera_dist_coeffs: [-0.007321423050203202, 0.11155254367030723, 0.0002060492868599588, 0.0019282228531227524, 0.0]
+   camera_ext_R: [-0.01054617149914512,-0.021996912691051848,0.9997024127703067,-0.9997934033379208,-0.01714090190208695,-0.010924290547262096,0.017376101653955277,-0.9996110870303737,-0.02181159731120439] 
+   camera_ext_t: [0.0016717653645199405,0.0013027085445586081,0.0759704426143084] 
+
+   # B0475 @ 1080p December 1 2024 v2
+   # camera_intrinsic: [1648.16666227688, 0.0, 940.7969418827039, 0.0, 1643.482300070386, 539.7523730063378, 0.0, 0.0, 1.0]
+   # camera_dist_coeffs: [-0.004577123106083189, 0.11438641777597598, 0.0015236350100332047, -0.0019763175224402512, 0.0]
+   # camera_ext_R: [0.008648978899049956,-0.021662639375601575,0.9997279255974029,-0.9998109530628808,-0.017598072265755542,0.008268372755458933,0.017414169503532424,-0.9996104430766077,-0.021810749475668176] 
+   # camera_ext_t: [0.03170302551008271,-0.008430202928033374,0.07449060244151086] 
+
+
+r3live_lio:        
+   # lio_update_point_step: This parameter determines the point step used for the LIO update. A smaller value means that more points will be used in the LIO update process, potentially improving the accuracy of the pose estimation. However, this may also increase the computational cost.
+   lio_update_point_step: 8   # default = 4 | good = 32 | Take more steps, you keep all points but it processes faster. 
+   # max_iteration: This parameter specifies the maximum number of LIO Extended State Information Kalman Filter (ESIKF) iterations. Increasing this number may lead to better convergence and potentially more accurate pose estimation. However, it will also increase the computational cost.
+   max_iteration: 2           # default = 2 | 24 was OK too
+   # lidar_time_delay: This parameter is used to provide a time-offset between the LiDAR and the IMU. A correct time synchronization is crucial for accurate pose estimation. If you are certain that there is no time delay between the LiDAR and the IMU, you can leave this value at zero. Otherwise, you might need to experiment with this parameter to find the optimal time-offset that gives the best results.
+   lidar_time_delay: 0.0       # default = 0  The time-offset between LiDAR and IMU, provided by user. 
+   # filter_size_corner: This parameter is related to the edge (corner) feature extraction from the input point cloud. The filter size determines the neighborhood size for edge feature extraction. A smaller value will result in a smaller neighborhood, potentially giving more precise features, but may also lead to more noise. A larger value will result in a larger neighborhood, which could smooth out noise but might result in less precise features.
+   filter_size_corner: 0.3   #*# default = 0.30  | good = 0.2 | too low ruins everything | tried to lower to filter tighter corners
+   # filter_size_surf: This parameter is related to the planar (surface) feature extraction from the input point cloud. Similar to filter_size_corner, a smaller value will result in a smaller neighborhood and potentially more precise features, while a larger value might smooth out noise but give less precise features. 
+   filter_size_surf: 0.15    #*# default = 0.30  | good = 0.2 |too low ruins everything |  tried to lower to filter tighter surfaces
+   # filter_size_surf_z: This parameter is an additional filter size specific to the z-axis for planar (surface) feature extraction. Adjusting this value will similarly affect the precision and noise in the extracted planar features. 
+   filter_size_surf_z: 0.15   #*# default = 0.30  | good = 0.2 | too low ruins everything | tried to lower to filter tighter surfaces
+   # filter_size_map: This parameter is related to the filtering of the global map. A smaller value will result in a denser point cloud map, while a larger value will lead to a sparser map. It's important to find a balance between map density and computational cost.
+   filter_size_map: 0.3      #*# default = 0.30  | good = 0.2 | too low ruins everything | tried to lower to filter tighter map
+   # fov_degree: Probably the FOV of the lidar? Lets test.
+   fov_degree: 360            # default = 360 | Everything else is slower and no better. Leave 360.
+   #publish_feature_map: No idea lets turn it on -- didn't work
+   publish_feature_map: 0     # default = 0
+   # voxel_downsample_size_surf: not sure
+   voxel_downsample_size_surf: 1       # default = 0.10 | good = 0.1 | Processing faster when closer to 1 also it looks clear. 
+   # voxel_downsample_size_axis_z: not sure (I think this is like clockwise/anticlockwise)
+   voxel_downsample_size_axis_z: 1     # default = 0.10 | good = 0.1 | Processing faster when closer to 1 also it looks clear. 
+   # planar_check_dis: not sure
+   planar_check_dis: 0.1                  # default 0.10 | good = 0.05 unsure of downsides of lower
+   #long_rang_pt_dis: not sure. If you thought this was about how far to publish a viewed point? No. It's not a filter. Decreasing this seems to have changed frame time from 100 to 300ms
+   long_rang_pt_dis: 100                  # default 500 | good=100 | Think that 100m is OK
+   #cube_side_length: not sure (perhaps voxel cube side length?)
+   cube_side_length: 1e+07                 # default = 1e+07  | Not sure -- but maybe increasing this to 1e+10 was good? UI'll try 1e+5 and review
+   #maximum_pt_kdtree_dis
+   maximum_pt_kdtree_dis: 0.5             # default = 0.5 | good = 0.3 | good = 0.8 too | tired to half kdtree_dis in case that keeps kdtree 'tighter' was ok. 0.1 was bad. 1.0 was bad.
+   #maximum_res_dis
+   maximum_res_dis: 0.5                  # default = 0.3 | OK = 0.5 | test 0.9 | too low (0.1) drifted backwards
+   
